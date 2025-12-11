@@ -14,4 +14,5 @@ st_layers(lion_gdb)
 lion_gdb <- here("data", "lion", "lion.gdb")
 
 lion <- st_read(lion_gdb, layer = "lion") %>%
-  st_transform(2263)   # NYC coordinates, ft
+  st_transform(2263) %>% 
+  clean_names() # NYC coordinates, ft
