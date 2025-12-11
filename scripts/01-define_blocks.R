@@ -1,3 +1,6 @@
+
+#01
+
 #-------------------------------------------------
 # 00. Libraries
 #-------------------------------------------------
@@ -201,4 +204,55 @@ leaflet() |>
     colors = "#3388ff",
     labels = "Segments where generic_id maps to >1 physical_id"
   )
+
+
+
+
+#-------------------------------------------------
+# Streets with NYPDID in the sampled ZIP cluster
+#Have no idea what this is
+#-------------------------------------------------
+
+nypd_streets <- lion_city_streets |>
+  filter(
+    !is.na(nypdid),
+    str_trim(nypdid) != ""
+  )
+
+# Handle curved geometries + project to WGS84 for leaflet
+nypd_streets_4326 <- nypd_streets |>
+  st_cast("MULTILINESTRING") |>
+  st_make_valid() |>
+  st_transform(4326)
+
+# Mouseover label: NYPDID + IDs + street name
+nypd_streets_4326$label_text <- sprintf(
+  "Street: %s<br>NYPDID: %s<br>Physical ID: %s<br>Segment ID: %s<br>Generic ID: %s",
+  nypd_streets_4326$street,
+  nypd_streets_4326$nypdid,
+  nypd_streets_4326$physical_id,
+  nypd_streets_4326$segment_id,
+  nypd_streets_4326$generic_id
+)
+
+# Leaflet map
+leaflet() |>
+  addTiles() |>
+  addPolylines(
+    data   = nypd_streets_4326,
+    weight = 2,
+    opacity = 0.8,
+    label  = ~ lapply(label_text, HTML),
+    highlightOptions = highlightOptions(
+      weight = 4,
+      opacity = 1,
+      bringToFront = TRUE
+    )
+  ) |>
+  addLegend(
+    "bottomright",
+    colors = "#3388ff",
+    labels = paste("Streets with NYPDID in ZIPs:", paste(sample_zips, collapse = ", "))
+  )
+
 
