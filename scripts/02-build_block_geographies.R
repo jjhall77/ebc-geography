@@ -164,10 +164,12 @@ cat("Physical blocks created:", nrow(physical_blocks), "\n")
 # Load nodes from LION
 lion_gdb <- here("data", "lion", "lion.gdb")
 
+
+
 nodes <- st_read(lion_gdb, layer = "node", quiet = TRUE) |>
   st_transform(2263) |>
   clean_names() |>
-  mutate(nodeid = as.character(nodeid))
+  mutate(nodeid = str_pad(as.character(nodeid), width = 7, side = "left", pad = "0"))
 
 # Count street names per node to identify intersections
 node_street_counts <- lion_city_streets |>
@@ -240,3 +242,4 @@ cat("3. physical_to_node.csv - Physical block to node crosswalk\n")
 cat("4. intersection_to_blocks.rds - Intersection -> adjacent blocks lookup\n")
 cat("5. intersection_to_blocks_flat.csv - Flat version for inspection\n")
 cat("6. intersection_nodes.gpkg - Intersection point geometries\n")
+
